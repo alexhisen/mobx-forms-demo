@@ -29,5 +29,9 @@ node_modules
 # Gitbook generated static pages
 _book
 
+# User-specific Webstorm files
 /.idea/dbnavigator.xml
 /.idea/workspace.xml
+
+# webpack-generated files
+www/inc/
