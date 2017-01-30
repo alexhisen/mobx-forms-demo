@@ -1,0 +1,163 @@
+@import "~react-toolbox/lib/commons";
+
+@import "../fonts/material-icons.css";
+
+body {
+  -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold - this is present in React-Toolbox as well*/
+  -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+  /* -webkit-user-select: none;  */                /* prevent copy paste, to allow, change 'none' to 'text' */
+  background: #ffffff;
+  /* React-Toolbox uses 1.6rem font-size: 100%; */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  padding: 1.4em;
+}
+
+.topNotice {
+  margin: -1.4em -1.4em 1em -1.4em;
+}
+
+/* Slide-down animation - the transition times need to be synced with the numbers provided to ReactCSSTransitionGroup */
+.slideWrapper {
+  overflow:hidden;
+  display:block;
+}
+.slideDown-enter, .slideDown-appear {
+  margin-top: -100%;
+  transition: all 1s /* ease-in */;
+}
+.slideDown-enter.slideDown-enter-active, .slideDown-appear.slideDown-appear-active {
+  margin-top: 0;
+}
+.slideDown-leave {
+  margin-top: 0;
+  transition: all .3s /* ease-out */;
+}
+.slideDown-leave.slideDown-leave-active {
+  margin-top: -100%;
+}
+
+
+/* SchemaForm Components */
+.SchemaForm {
+  padding-bottom: 2rem;
+
+  abbr {
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    color: #424242;
+    float: left;
+    width: 120px;
+    margin-left: 45px;
+    margin-top: -5px;
+  }
+
+  label[data-react-toolbox=radio-button] {
+    display: inline-block;
+    width: 60px;
+    text-align: center;
+
+    span {
+      padding-left: 0;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+      color: #424242;
+    }
+  }
+  div[data-react-toolbox=radio] {
+    display: block;
+    left: 50%;
+    margin-left: -1rem;
+  }
+
+  label[data-react-toolbox=switch] {
+    float: left;
+    margin-bottom: 0;
+  }
+
+  dl {
+    position: relative;
+    padding-top: 2rem;
+  }
+  dd {
+    display: inline-block;
+    width: 40%;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+    font-weight: bold;
+    color: #616161;
+    padding: 1.2rem 0 2rem 0;
+    vertical-align: middle;
+  }
+  dt {
+    display: inline-block;
+    width: 60%;
+    vertical-align: middle;
+  }
+
+  dl.SchemaField--error::before {
+    content: ">";
+    color: #eb4105;
+    position: absolute;
+    left: -15px;
+    top: 0;
+    padding-top: 2.7rem;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  .SchemaField--error .SchemaField__required {
+    color: #de3226;
+  }
+
+  dl[data-field-type=input], dl[data-field-type=dropdown], dl[data-field-type=datepicker] {
+    padding-top: 0;
+    dd {
+      padding: 3rem 0 0 0;
+      vertical-align: top;
+    }
+  }
+
+  dl[data-field-type=slider] {
+    ol {
+      display: table;
+      margin: 0;
+      padding: 0;
+    }
+    ol li {
+      display: table-cell;
+      text-align: center;
+      padding-top: 0.2em;
+    }
+  }
+
+  .hideFieldTitle {
+    padding-top: 0;
+    dd {
+      display: none;
+    }
+    dt {
+      width: 100%
+    }
+  }
+
+  .fullWidthField {
+    padding-top: 0;
+    margin: 2rem 0;
+    dd, dt {
+      width: 100%;
+      padding: 0;
+    }
+
+    abbr {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: auto;
+      margin:0;
+      line-height: 24px;
+    }
+  }
+}

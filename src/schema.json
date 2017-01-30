@@ -1,0 +1,265 @@
+{
+  "schema": {
+    "type": "object",
+    "title": "MySchema",
+    "properties": {
+      "firstName": {
+        "title": "First Name",
+        "type": "string"
+      },
+      "lastName": {
+        "title": "Last Name",
+        "type": "string"
+      },
+      "email": {
+        "title": "Email",
+        "type": "string",
+        "pattern": "^[A-Za-z0-9!#-'\\*\\+\\-/=\\?\\^_`\\{-~]+(\\.[A-Za-z0-9!#-'\\*\\+\\-/=\\?\\^_`\\{-~]+)*@[A-Za-z0-9!#-'\\*\\+\\-/=\\?\\^_`\\{-~]+(\\.[A-Za-z0-9!#-'\\*\\+\\-/=\\?\\^_`\\{-~]+)*$",
+        "validationMessage": {
+          "default":"Email must be of proper format: abc@xyz.com",
+          "302": "Email is required"
+        }
+      },
+      "password": {
+        "title": "Password",
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 15,
+        "validationMessage": {
+          "default": "<%= title %> must be from <%= minlength %> to <%= maxlength %> characters in length",
+          "302": "<%= title %> is required"
+        }
+      },
+      "confirmPassword": {
+        "title": "Confirm Password",
+        "type": "string",
+        "validationMessage": {
+          "302": "<%= title %> is required",
+          "notSamePassword": "Confirm Password must be the same as Password"
+        }
+      },
+      "phone": {
+        "title": "Phone Number",
+        "type": "string"
+      },
+      "country": {
+        "title": "Country",
+        "type": "string",
+        "enum": ["Canada", "USA"],
+        "default": "USA"
+      },
+      "state": {
+        "title": "State",
+        "type": "string",
+        "modelKey": "region"
+      },
+      "province": {
+        "title": "Province",
+        "type": "string",
+        "modelKey": "region"
+      },
+      "shippingMethod": {
+        "title": "Shipping Method",
+        "type": "string"
+      },
+      "age": {
+        "title": "Your Age",
+        "type": "integer",
+        "minimum": 13,
+        "maximum": 100
+      },
+      "subscribe": {
+        "title": "Subscribe to our newsletter",
+        "type": "boolean"
+      },
+      "selectDelivery": {
+        "title": "Deliver on a specific date?",
+        "description": "There is a small fee for this service",
+        "type": "boolean"
+      },
+      "deliveryDate": {
+        "title": "Delivery Date",
+        "type": "object"
+      },
+      "deliveryHour": {
+        "title": "Delivery Hour",
+        "type": "number"
+      },
+      "notes": {
+        "title": "Notes",
+        "type": "string"
+      }
+    },
+    "required": ["firstName", "email", "deliveryDate"]
+  },
+  "form": [
+    {
+      "type": "help",
+      "description": "This uses a mock server implementation that stores the information in your browser's localStorage. You can use server.delete();store.refresh(); in the console to clear it."
+    },
+    {
+      "key": "firstName",
+      "className": "hideFieldTitle"
+    },
+    {
+      "key": "lastName",
+      "className": "hideFieldTitle"
+    },
+    {
+      "key": "email",
+      "type": "email",
+      "className": "hideFieldTitle"
+    },
+    {
+      "key": "password",
+      "type": "password",
+      "className": "hideFieldTitle"
+    },
+    {
+      "key": "confirmPassword",
+      "type": "password",
+      "validations": ["sameAsPassword"],
+      "className": "hideFieldTitle"
+    },
+    {
+      "type": "fieldset",
+      "items": [
+        {
+          "key": "phone",
+          "type": "tel"
+        },
+        {
+          "key": "shippingMethod",
+          "type": "radios",
+          "titleMap": ["Ground", "2-day", "Overnight"]
+        },
+        "country",
+        {
+          "key": "state",
+          "type": "select",
+          "condition": "model.data.country === 'USA'",
+          "titleMap": [
+            { "value": null, "name": "Select State" },
+            { "value": "AL", "name": "Alabama" },
+            { "value": "AK", "name": "Alaska" },
+            { "value": "AZ", "name": "Arizona" },
+            { "value": "AR", "name": "Arkansas" },
+            { "value": "CA", "name": "California" },
+            { "value": "CO", "name": "Colorado" },
+            { "value": "CT", "name": "Connecticut" },
+            { "value": "DE", "name": "Delaware" },
+            { "value": "DC", "name": "District of Columbia" },
+            { "value": "FL", "name": "Florida" },
+            { "value": "GA", "name": "Georgia" },
+            { "value": "HI", "name": "Hawaii" },
+            { "value": "ID", "name": "Idaho" },
+            { "value": "IL", "name": "Illinois" },
+            { "value": "IN", "name": "Indiana" },
+            { "value": "IA", "name": "Iowa" },
+            { "value": "KS", "name": "Kansas" },
+            { "value": "KY", "name": "Kentucky" },
+            { "value": "LA", "name": "Louisiana" },
+            { "value": "ME", "name": "Maine" },
+            { "value": "MD", "name": "Maryland" },
+            { "value": "MA", "name": "Massachusetts" },
+            { "value": "MI", "name": "Michigan" },
+            { "value": "MN", "name": "Minnesota" },
+            { "value": "MS", "name": "Mississippi" },
+            { "value": "MO", "name": "Missouri" },
+            { "value": "MT", "name": "Montana" },
+            { "value": "NE", "name": "Nebraska" },
+            { "value": "NV", "name": "Nevada" },
+            { "value": "NH", "name": "New Hampshire" },
+            { "value": "NJ", "name": "New Jersey" },
+            { "value": "NM", "name": "New Mexico" },
+            { "value": "NY", "name": "New York" },
+            { "value": "NC", "name": "North Carolina" },
+            { "value": "ND", "name": "North Dakota" },
+            { "value": "OH", "name": "Ohio" },
+            { "value": "OK", "name": "Oklahoma" },
+            { "value": "OR", "name": "Oregon" },
+            { "value": "PA", "name": "Pennsylvania" },
+            { "value": "RI", "name": "Rhode Island" },
+            { "value": "SC", "name": "South Carolina" },
+            { "value": "SD", "name": "South Dakota" },
+            { "value": "TN", "name": "Tennessee" },
+            { "value": "TX", "name": "Texas" },
+            { "value": "UT", "name": "Utah" },
+            { "value": "VT", "name": "Vermont" },
+            { "value": "VA", "name": "Virginia" },
+            { "value": "WA", "name": "Washington" },
+            { "value": "WV", "name": "West Virginia" },
+            { "value": "WI", "name": "Wisconsin" },
+            { "value": "WY", "name": "Wyoming" }
+          ]
+        },
+        {
+          "key": "province",
+          "type": "select",
+          "condition": "model.data.country === 'Canada'",
+          "titleMap": [
+            { "value": null, "name": "Select Province" },
+            { "value": "AB", "name": "Alberta" },
+            { "value": "BC", "name": "British Columbia" },
+            { "value": "MB", "name": "Manitoba" },
+            { "value": "NB", "name": "New Brunswick" },
+            { "value": "NL", "name": "Newfoundland and Labrador" },
+            { "value": "NT", "name": "Northwest Territories" },
+            { "value": "NS", "name": "Nova Scotia" },
+            { "value": "NU", "name": "Nunavut" },
+            { "value": "ON", "name": "Ontario" },
+            { "value": "PE", "name": "Prince Edward Island" },
+            { "value": "QC", "name": "Quebec" },
+            { "value": "SK", "name": "Saskatchewan" },
+            { "value": "YT", "name": "Yukon" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Additional Info",
+      "description": "This information makes our service better",
+      "items": [
+        "age",
+        "subscribe",
+        {
+          "key": "selectDelivery",
+          "type": "switch",
+          "default": false,
+          "titleMap": ["Yes"]
+        },
+        {
+          "key": "deliveryDate",
+          "placeholder": "Preferred Delivery Date",
+          "condition": "model.data.selectDelivery === true",
+          "type": "date",
+          "min": "3 days from today",
+          "max": "4 weeks from today"
+        },
+        {
+          "key": "deliveryHour",
+          "condition": "model.data.selectDelivery === true",
+          "type": "range",
+          "min": 8,
+          "max": 18,
+          "step": 1,
+          "className": "fullWidthField"
+        },
+        {
+          "key": "notes",
+          "type": "textarea",
+          "props": {
+            "rows": 5
+          },
+          "className": "hideFieldTitle"
+        }
+      ]
+    }
+  ],
+  "defaults": {
+    "validationMessage": {
+      "default": "<%= title %> is required"
+    }
+  }
+}

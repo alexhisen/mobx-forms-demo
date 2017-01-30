@@ -1,0 +1,8 @@
+.container {
+  background: lightgray;
+  padding: 1.6em;
+  color: red;
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 2rem;
+}
