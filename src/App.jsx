@@ -1,5 +1,5 @@
 import React from 'react';
-import { observable, asReference } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
 import combinedSchema from './schema.json';
@@ -9,7 +9,7 @@ import SchemaEditor from './SchemaEditor';
 
 @observer class App extends React.Component {
   @observable json = JSON.stringify(combinedSchema, undefined, 2);
-  @observable combinedSchema = asReference(combinedSchema); // asReference is needed to prevent mangling arrays
+  @observable.ref combinedSchema = combinedSchema; // ref (f.k.a. asReference) is needed to prevent mangling arrays
 
   onChange = (json) => {
     try {
