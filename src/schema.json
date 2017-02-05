@@ -74,7 +74,7 @@
       },
       "selectDelivery": {
         "title": "Deliver on a specific date?",
-        "description": "There is a small fee for this service",
+        "description": "Select this to see date and range widgets",
         "type": "boolean"
       },
       "deliveryDate": {
@@ -95,7 +95,7 @@
   "form": [
     {
       "type": "help",
-      "description": "This uses a mock server implementation that stores the information in your browser's localStorage. You can use server.delete();store.refresh(); in the console to clear it."
+      "description": "<div style='margin-bottom:10px'>This uses a mock server implementation that stores the information in your browser's localStorage. It requires that date fields have the word date in them. You can use server.delete();store.refresh(); in the console to clear it.<br /><br />You can edit the schema and form definitions and the form will reflect it immediately (though your changes won't be saved!) except validation error messages which need a field to be revalidated (by changing its value). JSON must also be valid with double-quotes and no extra commas (see console for errors).</div>"
     },
     {
       "key": "firstName",

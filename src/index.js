@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 
 import './scss/index.scss';
 
-import Form from './Form';
+import App from './App';
 
 /* eslint-disable */
 const { AppContainer } = require('react-hot-loader');
@@ -12,16 +12,16 @@ const { AppContainer } = require('react-hot-loader');
 ReactDOM.render(
   /* eslint-disable react/jsx-filename-extension */
   <AppContainer>
-    <Form />
+    <App />
   </AppContainer>,
   document.getElementById('app')
   /* eslint-enable */
 );
 
 if (module.hot) {
-  module.hot.accept('./Form.jsx', () => {
+  module.hot.accept('./App.jsx', () => {
     /* eslint-disable global-require */
-    const NextApp = require('./Form.jsx').default;
+    const NextApp = require('./App.jsx').default;
     /* eslint-enable */
 
     ReactDOM.render(

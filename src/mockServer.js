@@ -20,7 +20,11 @@ function setRecord(data) {
 
 class MockServer {
   async get() {
-    return getRecord();
+    const data = getRecord();
+    Object.keys(data).filter((key) => key.match(/date/i)).forEach((key) => {
+      data[key] = new Date(data[key]);
+    });
+    return data;
   }
 
   async create(info) {
