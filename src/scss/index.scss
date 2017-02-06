@@ -1,5 +1,7 @@
-@import "~react-toolbox/lib/commons";
-
+/* 1.x: @import "~react-toolbox/lib/commons"; */
+/* React-Toolbox 2.x no longer bundles this or any other reset so part of 1.x commons is now in global.scss */
+@import "~normalize.css";
+@import './global.scss';
 @import "../fonts/material-icons.css";
 
 body {
