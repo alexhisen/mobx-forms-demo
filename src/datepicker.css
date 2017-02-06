@@ -1,0 +1,9 @@
+.title {
+  /* Work around for misalignment in React-Toolbox - the left/right buttons are 3.6rem and title is 3.0rem by default */
+  line-height: 3.6rem!important;
+}
+
+/* Work around for bug in React-Toolbox 2.0 */
+.next > span, .prev > span {
+  vertical-align: top!important;
+}

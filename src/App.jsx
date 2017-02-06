@@ -1,6 +1,8 @@
 import React from 'react';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+import { ThemeProvider } from 'react-css-themr';
+import theme from './theme';
 
 import combinedSchema from './schema.json';
 
@@ -22,10 +24,12 @@ import SchemaEditor from './SchemaEditor';
 
   render() {
     return (
-      <div>
-        <Form combinedSchema={this.combinedSchema} />
-        <SchemaEditor json={this.json} onChange={this.onChange} />
-      </div>
+      <ThemeProvider theme={theme}>
+        <div>
+          <Form combinedSchema={this.combinedSchema} />
+          <SchemaEditor json={this.json} onChange={this.onChange} />
+        </div>
+      </ThemeProvider>
     );
   }
 }
