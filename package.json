@@ -56,6 +56,7 @@
     "eslint-plugin-react": "^6.3.0",
     "fast-async": "6.0.34",
     "file-loader": "^0.9.0",
+    "modules-values-extract": "^1.0.3",
     "node-sass": "^3.8.0",
     "normalize.css": "^4.2.0",
     "postcss-loader": "^0.10.1",

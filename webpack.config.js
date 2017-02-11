@@ -1,8 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const merge = require('webpack-merge');
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const SplitByPathPlugin = require('webpack-split-by-path');
+const extractValues = require('modules-values-extract');
 
 const HOST = '127.0.0.1';
 const PORT = 8080;
@@ -14,6 +16,7 @@ const PATHS = {
   buildjs: path.join(__dirname, 'www/inc'),
 };
 
+const reactToolboxVariables = {};
 
 const common = {
   entry: {
@@ -37,10 +40,6 @@ const common = {
   module: {
     loaders: [
       {
-        test: /\.png$/,
-        loader: 'url-loader?limit=100000',
-      },
-      {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'url-loader?limit=100000&mimetype=application/font-woff&name=fonts/[hash].[ext]',
       },
@@ -50,33 +49,8 @@ const common = {
         include: path.resolve(__dirname, 'src/fonts'),
       },
       {
-        test: /\.svg$/,
-        loader: 'file-loader?name=images/[hash].[ext]',
-        include: path.resolve(__dirname, 'src/images'),
-      },
-      {
-        test: /\.svg$/,
-        loader: 'babel!svg-react',
-        include: path.resolve(__dirname, 'src/icons'),
-      },
-      {
-        test: /\.json/,
-        loader: 'file-loader?name=models/[hash].[ext]',
-        include: path.resolve(__dirname, 'src/models'),
-      },
-      {
-        test: /\.jpg/,
-        loader: 'url-loader?name=textures/[hash].[ext]',
-        include: path.resolve(__dirname, 'src/textures'),
-      },
-      {
         test: /\.json$/,
         loader: 'json-loader',
-        exclude: path.resolve(__dirname, 'src/models'),
-      },
-      {
-        test: /\.htm$/,
-        loader: 'raw-loader',
       },
       {
         test: /\.jsx?$/,
@@ -88,7 +62,13 @@ const common = {
   postcss: () => {
     return [
       /* eslint-disable global-require */
-      require('postcss-cssnext'),
+      require('postcss-cssnext')({
+        features: {
+          customProperties: {
+            variables: reactToolboxVariables,
+          },
+        },
+      }),
       require('postcss-modules-values'),
       /* eslint-enable global-require */
     ];
@@ -107,7 +87,7 @@ const common = {
 };
 
 // Setup used to run Hot Module Reload
-module.exports = merge(common, {
+const config = merge(common, {
   entry: {
     app: [
       `webpack-dev-server/client?http://${HOST}:${PORT}/`,
@@ -128,7 +108,7 @@ module.exports = merge(common, {
     // in handy in more complicated setups.
     historyApiFallback: true,
     hot: true,
-    inline: false, /* we have to use an explicit script tag in our index-dev.html so it can parse the url for socket communication */
+    inline: false, /* With this set to false, it updates without reloading the whole UI */
     progress: true,
 
     // Display only errors to reduce the amount of output.
@@ -173,3 +153,15 @@ module.exports = merge(common, {
   },
 });
 
+const cssFiles = fs.readdirSync(path.resolve(PATHS.src, 'css'))
+  .filter((file) => file.match(/\.css/i))
+  .map((file) => path.resolve(path.resolve(PATHS.src, 'css', file)));
+
+// Note that changes in these variables are not picked up by HMR
+module.exports = extractValues({ files: cssFiles }).then((variables) => {
+  Object.keys(variables).filter((key) => key.match(/-/)).forEach((key) => {
+    reactToolboxVariables[key] = variables[key];
+  });
+  console.log(reactToolboxVariables); // eslint-disable-line
+  return config;
+});

@@ -1,0 +1,8 @@
+@value buttonPrimaryColor: #ffffff;
+@value buttonPrimaryBackgroundColor: #9c3990;
+@value buttonPrimaryDisabledBackgroundColor: #cccccc;
+
+/* global React-Toolbox overrides - THESE MUST BE NAMED EXACTLY LIKE THIS */
+@value color-primary: var(--palette-deep-purple-500);
+@value color-primary-dark: var(--palette-deep-purple-700);
+@value color-text: #444548;
