@@ -51,42 +51,61 @@ input:not([type="checkbox"]):not([type="radio"]), button {
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 
-// -- Remove firefox default style for required inputs
+/* Remove firefox default style for required inputs */
 input[required]:-moz-ui-invalid {
   box-shadow: none;
 }
 
-// -- Material design font sizes - Need 2.x equivalent!
-/*
+/* Unlike the React-Toolbox 1.x commons.scss, these do not set font-family or letter-spacing: */
+
+$unit: 1rem !default; /* 1rem = 10px */
+
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
-  @include typo-display-3($color-contrast: true);
+  font-size: $unit * 5.6;
+  font-weight: 400;
+  line-height: 1.35;
+  opacity: .54;
 }
 
 h1 {
-  @include typo-display-3;
+  font-size: $unit * 5.6;
+  font-weight: 400;
+  line-height: 1.35;
 }
 
 h2 {
-  @include typo-display-2;
+  font-size: $unit * 4.5;
+  font-weight: 400;
+  line-height: $unit * 4.8;
 }
 
 h3 {
-  @include typo-display-1;
+  font-size: $unit * 3.4;
+  font-weight: 400;
+  line-height: $unit * 4;
 }
 
 h4 {
-  @include typo-headline;
+  font-size: $unit * 2.4;
+  font-weight: 400;
+  line-height: $unit * 3.2;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h5 {
-  @include typo-title;
+  font-size: $unit * 2;
+  font-weight: 500;
+  line-height: 1;
 }
 
 h6 {
-  @include typo-subhead;
+  font-size: $unit * 1.6;
+  font-weight: 400;
+  line-height: $unit * 2.4;
 }
 
 p {
-  @include typo-body-1;
+  font-size: $unit * 1.4;
+  font-weight: 400;
+  line-height: $unit * 2.4;
 }
-*/
