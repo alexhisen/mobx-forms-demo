@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Snackbar } from 'react-toolbox/lib/snackbar';
 import { observer } from 'mobx-react';
@@ -26,9 +27,9 @@ import { observer } from 'mobx-react';
 }
 
 Notification.propTypes = {
-  type: React.PropTypes.oneOf(['error', 'warning', 'accept', 'cancel', null]),
-  observable: React.PropTypes.shape({
-    active: React.PropTypes.bool.isRequired,
+  type: PropTypes.oneOf(['error', 'warning', 'accept', 'cancel', null]),
+  observable: PropTypes.shape({
+    active: PropTypes.bool.isRequired,
   }).isRequired,
 };
 

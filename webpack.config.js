@@ -14,6 +14,14 @@ const PATHS = {
   src: path.join(__dirname, 'src'),
   build: path.join(__dirname, 'www'),
   buildjs: path.join(__dirname, 'www/inc'),
+
+  // This is not needed in normal use, it's only for development with an npm-linked mobx-schema-form cloned repo:
+  // On Windows when doing the npm link between the projects, you must CD to path with uppercase drive letters!
+  // (see https://github.com/webpack/webpack/issues/2362)
+  // non-debug should be root of package, debug should be src:
+  mobxSchemaForm: fs.realpathSync(path.resolve(__dirname, 'node_modules/mobx-schema-form')),
+  // non-debug should be lib/SaveButton.js, debug should be src/SaveButton.jsx:
+  mobxSchemaFormSaveButton: fs.realpathSync(path.resolve(__dirname, 'node_modules/mobx-schema-form/lib/SaveButton.js')),
 };
 
 const reactToolboxVariables = {};
@@ -33,10 +41,20 @@ const common = {
   resolve: {
     extensions: ['', '.jsx', '.js', '.json', '.scss', '.css'],
     moduleDirectories: [
+      path.resolve(__dirname, 'node_modules'),
       'node_modules',
-      path.resolve(__dirname, './node_modules'),
     ],
+    fallback: path.join(__dirname, 'node_modules'),
+    /* This is not needed in normal use, it's only for development with an npm-linked mobx-schema-form cloned repo: */
+    alias: {
+      'mobx-schema-form$': PATHS.mobxSchemaForm,
+      SchemaFormSaveButton: PATHS.mobxSchemaFormSaveButton,
+      react: path.resolve(PATHS.vendor, 'react'),
+      mobx: path.resolve(PATHS.vendor, 'mobx'),
+      'mobx-react': path.resolve(PATHS.vendor, 'mobx-react'),
+    },
   },
+  resolveLoader: { fallback: path.join(__dirname, 'node_modules') },
   module: {
     loaders: [
       {
@@ -55,7 +73,7 @@ const common = {
       {
         test: /\.jsx?$/,
         loader: 'babel?cacheDirectory',
-        include: PATHS.src,
+        include: [PATHS.src, path.resolve(PATHS.mobxSchemaForm, '..')],
       },
     ],
   },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+// import DevTools from 'mobx-react-devtools';
 import { ThemeProvider } from 'react-css-themr';
 import theme from './theme';
 
@@ -23,6 +24,7 @@ import SchemaEditor from './SchemaEditor';
   };
 
   render() {
+    // <DevTools position={{ top: 0, right: 0 }} />)
     return (
       <ThemeProvider theme={theme}>
         <div>

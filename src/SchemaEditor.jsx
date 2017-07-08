@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { observer } from 'mobx-react';
 
@@ -31,8 +32,8 @@ import 'brace/theme/monokai';
 }
 
 SchemaEditor.propTypes = {
-  json: React.PropTypes.string,
-  onChange: React.PropTypes.func,
+  json: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 export default SchemaEditor;

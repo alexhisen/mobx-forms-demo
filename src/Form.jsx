@@ -1,8 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { observe, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { MobxSchemaForm, FieldWrapper, validateForm, formShape } from 'mobx-schema-form';
-import SaveButton from 'mobx-schema-form/lib/SaveButton';
+// Uses webpack alias - eslint-import-resolver-webpack should allow Eslint to resolve it but it's not, at least not in Webstorm:
+import SaveButton from 'SchemaFormSaveButton'; // eslint-disable-line
 
 import FormErrors from './FormErrors';
 import Notification from './Notification';
@@ -70,6 +72,12 @@ function processSchema(combinedSchema) {
 }
 
 @observer class Form extends React.Component {
+  constructor(props) {
+    super(props);
+    processSchema(props.combinedSchema);
+    store.options.afterRefresh();
+  }
+
   componentDidMount() {
     store.refresh();
   }
@@ -128,15 +136,15 @@ function processSchema(combinedSchema) {
 }
 
 Form.propTypes = {
-  combinedSchema: React.PropTypes.shape({
-    schema: React.PropTypes.shape({
-      type: React.PropTypes.string,
-      title: React.PropTypes.string,
-      properties: React.PropTypes.object.isRequired, /* each key has the schema portion of formShape */
-      required: React.PropTypes.array,
+  combinedSchema: PropTypes.shape({
+    schema: PropTypes.shape({
+      type: PropTypes.string,
+      title: PropTypes.string,
+      properties: PropTypes.object.isRequired, /* each key has the schema portion of formShape */
+      required: PropTypes.array,
     }).isRequired,
     /* actually a subset of formShape, no schema and some properties in formShape are copied from schema */
-    form: React.PropTypes.arrayOf(React.PropTypes.oneOfType([React.PropTypes.string, formShape])),
+    form: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, formShape])),
     /* actually a subset of formShape, no schema and some properties in formShape are copied from schema */
     defaults: formShape,
   }).isRequired,
