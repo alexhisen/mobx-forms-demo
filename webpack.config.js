@@ -87,6 +87,13 @@ const common = {
           },
         },
       }),
+      /* work-around for unneeded rule in React-Toolkit Dropdown/Autocomplete */
+      require('postcss-remove-rules')({
+        rulesToRemove: {
+          '.values::-webkit-scrollbar': '*',
+          '.suggestions::-webkit-scrollbar': '*',
+        },
+      }),
       require('postcss-modules-values'),
       /* eslint-enable global-require */
     ];
