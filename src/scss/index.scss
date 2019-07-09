@@ -29,24 +29,24 @@ form {
   margin: -1.4em -1.4em 1em -1.4em;
 }
 
-/* Slide-down animation - the transition times need to be synced with the numbers provided to ReactCSSTransitionGroup */
+/* Slide-down animation - the transition times need to be synced with the numbers provided to CSSTransition */
 .slideWrapper {
   overflow:hidden;
   display:block;
 }
 .slideDown-enter, .slideDown-appear {
-  margin-top: -100%;
-  transition: all 1s /* ease-in */;
+  transform: translateY(-100%);
 }
 .slideDown-enter.slideDown-enter-active, .slideDown-appear.slideDown-appear-active {
-  margin-top: 0;
+  transform: translateY(0);
+  transition: all 1s /* ease-in */;
 }
-.slideDown-leave {
-  margin-top: 0;
+.slideDown-exit {
+  transform: translateY(0);
+}
+.slideDown-exit.slideDown-exit-active {
+  transform: translateY(-100%);
   transition: all .3s /* ease-out */;
-}
-.slideDown-leave.slideDown-leave-active {
-  margin-top: -100%;
 }
 
 

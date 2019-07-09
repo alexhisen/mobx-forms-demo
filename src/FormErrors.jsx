@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { observer } from 'mobx-react';
 
 import { modelShape } from 'mobx-schema-form';
@@ -17,16 +17,19 @@ const FormErrors = observer((props) => {
   }
 
   return (
-    <ReactCSSTransitionGroup
+    <TransitionGroup
       className="slideWrapper topNotice"
-      transitionName="slideDown"
-      transitionAppear
-      transitionAppearTimeout={1000}
-      transitionEnterTimeout={1000}
-      transitionLeaveTimeout={300}
     >
-      {div}
-    </ReactCSSTransitionGroup>
+      {div &&
+        <CSSTransition
+          classNames="slideDown"
+          appear
+          timeout={{ appear: 1000, enter: 1000, exit: 300 }}
+        >
+          {div}
+        </CSSTransition>
+      }
+    </TransitionGroup>
   );
 });
 
