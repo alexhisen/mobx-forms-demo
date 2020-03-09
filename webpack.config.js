@@ -3,7 +3,6 @@ const merge = require('webpack-merge');
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
-const SplitByPathPlugin = require('webpack-split-by-path');
 const extractValues = require('modules-values-extract');
 
 const HOST = '127.0.0.1';
@@ -24,11 +23,35 @@ const PATHS = {
   mobxSchemaFormSaveButton: fs.realpathSync(path.resolve(__dirname, 'node_modules/mobx-schema-form/lib/SaveButton.js')),
 };
 
+const postcssPlugins = () => {
+  return [
+    /* eslint-disable global-require */
+    require('postcss-mixins')(),
+    require('postcss-each')(),
+    require('postcss-apply')(),
+    require('postcss-custom-properties')({
+      preserve: false, // returns calculated values instead of variable names
+      variables: reactToolboxVariables,
+    }),
+    require('postcss-preset-env')({
+      stage: 0, // enables all postcss-preset-env features to match cssnext
+      features: {
+        'environment-variables': false, // react-toolbox doesn't use env() but this feature's parser causes problems
+        'custom-properties': false,
+        'color-mod-function': true, // if you use a stage later than 0
+      },
+    }),
+    require('postcss-calc'), // required as postcss-preset-env doesn't have a reduce calc() function that cssnext did
+    require('postcss-modules-values'),
+    /* eslint-enable global-require */
+  ];
+};
+
 const reactToolboxVariables = {};
 
 const common = {
   entry: {
-    app: ['react-hot-loader/patch', PATHS.src],
+    app: [],
   },
   output: {
     path: PATHS.buildjs,
@@ -39,12 +62,11 @@ const common = {
     // If using dynamic file names, https://github.com/ampedandwired/html-webpack-plugin can help
   },
   resolve: {
-    extensions: ['', '.jsx', '.js', '.json', '.scss', '.css'],
-    moduleDirectories: [
-      path.resolve(__dirname, 'node_modules'),
+    extensions: ['.jsx', '.js', '.json', '.scss', '.css'],
+    modules: [
       'node_modules',
+      path.resolve(__dirname, './node_modules'),
     ],
-    fallback: path.join(__dirname, 'node_modules'),
     /* This is not needed in normal use, it's only for development with an npm-linked mobx-schema-form cloned repo: */
     alias: {
       'mobx-schema-form$': PATHS.mobxSchemaForm,
@@ -54,9 +76,13 @@ const common = {
       'mobx-react': path.resolve(PATHS.vendor, 'mobx-react'),
     },
   },
-  resolveLoader: { fallback: path.join(__dirname, 'node_modules') },
   module: {
-    loaders: [
+    rules: [
+      {
+        test: /\.(png|jpg)$/,
+        loader: 'url-loader?limit=100000',
+        exclude: path.resolve(__dirname, 'src/textures'),
+      },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'url-loader?limit=100000&mimetype=application/font-woff&name=fonts/[hash].[ext]',
@@ -67,42 +93,38 @@ const common = {
         include: path.resolve(__dirname, 'src/fonts'),
       },
       {
-        test: /\.json$/,
-        loader: 'json-loader',
+        test: /\.svg$/,
+        loader: 'file-loader?name=images/[hash].[ext]',
+        include: path.resolve(__dirname, 'src/images'),
       },
       {
-        test: /\.jsx?$/,
-        loader: 'babel?cacheDirectory',
-        include: [PATHS.src, path.resolve(PATHS.mobxSchemaForm, '..')],
+        test: /\.svg$/,
+        loader: 'babel-loader!svg-react-loader',
+        include: path.resolve(__dirname, 'src/icons'),
+      },
+      {
+        test: /\.jpg/,
+        loader: 'url-loader?name=textures/[hash].[ext]',
+        include: path.resolve(__dirname, 'src/textures'),
+      },
+      {
+        test: /\.htm$/,
+        loader: 'raw-loader',
       },
     ],
   },
-  postcss: () => {
-    return [
-      /* eslint-disable global-require */
-      require('postcss-cssnext')({
-        features: {
-          customProperties: {
-            variables: reactToolboxVariables,
-          },
+  plugins: [],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'initial',
         },
-      }),
-      require('postcss-color-mod-function'),
-      require('postcss-modules-values'),
-      /* eslint-enable global-require */
-    ];
-  },
-  plugins: [
-    new SplitByPathPlugin([
-      /* everything not specified here will go into app.js */
-      {
-        name: 'vendor',
-        path: PATHS.vendor,
       },
-    ], {
-      manifest: 'app-entry',
-    }),
-  ],
+    },
+  },
 };
 
 // Setup used to run Hot Module Reload
@@ -140,33 +162,115 @@ const config = merge(common, {
     new webpack.HotModuleReplacementPlugin(),
   ],
   module: {
-    loaders: [
-      {
-        test: /\.jsx?$/,
-        loaders: ['react-hot-loader/webpack', 'babel?cacheDirectory'],
-        include: PATHS.src,
-      },
+    rules: [
       {
         /* index.scss and everything it imports is processed as global CSS, not as CSS Modules */
         test: /index\.scss$/,
-        loaders: [
+        use: [
           'style-loader',
-          'css-loader?sourceMap&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass?sourceMap&sourceComments',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                mode: 'global',
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              warnings: false,
+              plugins: postcssPlugins,
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              sassOptions: {
+                sourceComments: true,
+              },
+            },
+          },
         ],
       },
       {
         test: /^((?!index).)*\.scss$/,
-        loaders: [
+        use: [
           'style-loader',
-          'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass?sourceMap&sourceComments',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                mode: 'local',
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              warnings: false,
+              plugins: postcssPlugins,
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              sassOptions: {
+                sourceComments: true,
+              },
+            },
+          },
         ],
       },
       {
         test: /\.css$/,
-        loaders: [
+        use: [
           'style-loader',
-          'css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss?sourceMap&sourceComments',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              warnings: false,
+              sourceMap: true,
+              sourceComments: true,
+              plugins: postcssPlugins,
+            },
+          },
         ],
+      },
+      {
+        test: /\.jsx?$/,
+        use: [{
+          loader: 'react-hot-loader/webpack',
+        }, {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: [
+              ['@babel/plugin-proposal-decorators', { legacy: true }],
+              ['@babel/plugin-proposal-class-properties', { loose: true }],
+            ],
+            include: [PATHS.src, path.resolve(PATHS.mobxSchemaForm, '..')],
+          },
+        }],
       },
     ],
   },

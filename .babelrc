@@ -1,24 +1,13 @@
 {
   "presets": [
-    "es2015",
-    "stage-0",
-    "react"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
   "plugins": [
-    "transform-decorators-legacy",
     "react-hot-loader/babel",
-    ["fast-async", {
-      "env": {
-        "augmentObject": false,
-        "dontMapStackTraces": true,
-        "asyncStackTrace": false,
-        "dontInstallRequireHook": false
-      },
-      "compiler": {
-        "promises": true,
-        "generators": false
-      },
-      "runtimePattern": null
-    }]
+    ["@babel/plugin-proposal-decorators", {"legacy": true}],
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-export-default-from",
+    ["module:fast-async", { "spec": true }]
   ]
 }
