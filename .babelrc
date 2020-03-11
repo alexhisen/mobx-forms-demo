@@ -8,6 +8,19 @@
     ["@babel/plugin-proposal-decorators", {"legacy": true}],
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-export-default-from",
-    ["module:fast-async", { "spec": true }]
+    ["module:fast-async", {
+      "spec": true,
+      "env": {
+        "augmentObject": false,
+        "dontMapStackTraces": true,
+        "asyncStackTrace": false,
+        "dontInstallRequireHook": false
+      },
+      "compiler": {
+        "promises": true,
+        "generators": false
+      },
+      "runtimePattern": null
+    }]
   ]
 }
