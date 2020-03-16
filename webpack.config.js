@@ -92,25 +92,6 @@ const common = {
         loader: 'file-loader?name=fonts/[hash].[ext]',
         include: path.resolve(__dirname, 'src/fonts'),
       },
-      {
-        test: /\.svg$/,
-        loader: 'file-loader?name=images/[hash].[ext]',
-        include: path.resolve(__dirname, 'src/images'),
-      },
-      {
-        test: /\.svg$/,
-        loader: 'babel-loader!svg-react-loader',
-        include: path.resolve(__dirname, 'src/icons'),
-      },
-      {
-        test: /\.jpg/,
-        loader: 'url-loader?name=textures/[hash].[ext]',
-        include: path.resolve(__dirname, 'src/textures'),
-      },
-      {
-        test: /\.htm$/,
-        loader: 'raw-loader',
-      },
     ],
   },
   plugins: [],
