@@ -4,6 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
 const extractValues = require('modules-values-extract');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const HOST = '127.0.0.1';
 const PORT = 8080;
@@ -22,6 +25,22 @@ const PATHS = {
   // non-debug should be lib/SaveButton.js, debug should be src/SaveButton.jsx:
   mobxSchemaFormSaveButton: fs.realpathSync(path.resolve(__dirname, 'node_modules/mobx-schema-form/lib/SaveButton.js')),
 };
+
+let config;
+const reactToolboxVariables = {};
+
+const cssFiles = fs.readdirSync(path.resolve(PATHS.src, 'css'))
+  .filter((file) => file.match(/\.css/i))
+  .map((file) => path.resolve(path.resolve(PATHS.src, 'css', file)));
+
+// Note that changes in these variables are not picked up by HMR
+module.exports = extractValues({ files: cssFiles }).then((variables) => {
+  Object.keys(variables).filter((key) => key.match(/-/)).forEach((key) => {
+    reactToolboxVariables[key] = variables[key];
+  });
+  console.log(reactToolboxVariables); // eslint-disable-line
+  return config;
+});
 
 const postcssPlugins = () => {
   return [
@@ -47,7 +66,7 @@ const postcssPlugins = () => {
   ];
 };
 
-const reactToolboxVariables = {};
+const cssLoader = process.env.NODE_ENV === 'production' ? MiniCssExtractPlugin.loader : 'style-loader';
 
 const common = {
   entry: {
@@ -81,7 +100,6 @@ const common = {
       {
         test: /\.(png|jpg)$/,
         loader: 'url-loader?limit=100000',
-        exclude: path.resolve(__dirname, 'src/textures'),
       },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -91,6 +109,70 @@ const common = {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader?name=fonts/[hash].[ext]',
         include: path.resolve(__dirname, 'src/fonts'),
+      },
+      {
+        /* index.scss and everything it imports is processed as global CSS, not as CSS Modules */
+        test: /index\.scss$/,
+        use: [
+          cssLoader,
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                mode: 'global',
+              },
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              sassOptions: {
+                sourceComments: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.css$/,
+        use: [
+          cssLoader,
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                mode: 'local',
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: true,
+              plugins: postcssPlugins,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.jsx?$/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: [
+              ['@babel/plugin-proposal-decorators', { legacy: true }],
+              ['@babel/plugin-proposal-class-properties', { loose: true }],
+            ],
+          },
+        }],
       },
     ],
   },
@@ -108,164 +190,95 @@ const common = {
   },
 };
 
-// Setup used to run Hot Module Reload
-const config = merge(common, {
-  entry: {
-    app: [
-      `webpack-dev-server/client?http://${HOST}:${PORT}/`,
-      'webpack/hot/only-dev-server',
-      'react-hot-loader/patch',
-      PATHS.src,
+if (process.env.NODE_ENV === 'development') {
+  // Setup used to run Hot Module Reload
+  // This is NOT used when just calling webpack
+  config = merge(common, {
+    entry: {
+      app: [
+        `webpack-dev-server/client?http://${HOST}:${PORT}/`,
+        'webpack/hot/only-dev-server',
+        'react-hot-loader/patch',
+        PATHS.src,
+      ],
+    },
+    output: {
+      publicPath: `http://${HOST}:${PORT}/inc/`, /* without this, manifest loads fail when base url is a file:// url */
+    },
+    devtool: 'source-map',
+    devServer: {
+      contentBase: PATHS.build,
+
+      // Enable history API fallback so HTML5 History API based
+      // routing works. This is a good default that will come
+      // in handy in more complicated setups.
+      historyApiFallback: true,
+      hot: true,
+      inline: false, /* With this set to false, it updates without reloading the whole UI */
+      progress: true,
+
+      // Display only errors to reduce the amount of output.
+      stats: 'errors-only',
+
+      host: HOST,
+      port: PORT,
+
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    },
+    plugins: [
+      new webpack.HotModuleReplacementPlugin(),
     ],
-  },
-  output: {
-    publicPath: `http://${HOST}:${PORT}/inc/`, /* without this, manifest loads fail when base url is a file:// url */
-  },
-  devtool: 'source-map',
-  devServer: {
-    contentBase: PATHS.build,
-
-    // Enable history API fallback so HTML5 History API based
-    // routing works. This is a good default that will come
-    // in handy in more complicated setups.
-    historyApiFallback: true,
-    hot: true,
-    inline: false, /* With this set to false, it updates without reloading the whole UI */
-    progress: true,
-
-    // Display only errors to reduce the amount of output.
-    stats: 'errors-only',
-
-    host: HOST,
-    port: PORT,
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-  ],
-  module: {
-    rules: [
-      {
-        /* index.scss and everything it imports is processed as global CSS, not as CSS Modules */
-        test: /index\.scss$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-              importLoaders: 1,
-              modules: {
-                mode: 'global',
-                localIdentName: '[name]__[local]___[hash:base64:5]',
-              },
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              warnings: false,
-              plugins: postcssPlugins,
-            },
-          },
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-              sassOptions: {
-                sourceComments: true,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /^((?!index).)*\.scss$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-              importLoaders: 1,
-              modules: {
-                mode: 'local',
-                localIdentName: '[name]__[local]___[hash:base64:5]',
-              },
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              warnings: false,
-              plugins: postcssPlugins,
-            },
-          },
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-              sassOptions: {
-                sourceComments: true,
-              },
-            },
-          },
-        ],
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-              importLoaders: 1,
-              modules: {
-                localIdentName: '[name]__[local]___[hash:base64:5]',
-              },
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              warnings: false,
-              sourceMap: true,
-              sourceComments: true,
-              plugins: postcssPlugins,
-            },
-          },
-        ],
-      },
-      {
-        test: /\.jsx?$/,
-        use: [{
-          loader: 'react-hot-loader/webpack',
-        }, {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-            plugins: [
-              ['@babel/plugin-proposal-decorators', { legacy: true }],
-              ['@babel/plugin-proposal-class-properties', { loose: true }],
-            ],
-            include: [PATHS.src, path.resolve(PATHS.mobxSchemaForm, '..')],
-          },
-        }],
-      },
-    ],
-  },
-});
-
-const cssFiles = fs.readdirSync(path.resolve(PATHS.src, 'css'))
-  .filter((file) => file.match(/\.css/i))
-  .map((file) => path.resolve(path.resolve(PATHS.src, 'css', file)));
-
-// Note that changes in these variables are not picked up by HMR
-module.exports = extractValues({ files: cssFiles }).then((variables) => {
-  Object.keys(variables).filter((key) => key.match(/-/)).forEach((key) => {
-    reactToolboxVariables[key] = variables[key];
   });
-  console.log(reactToolboxVariables); // eslint-disable-line
-  return config;
-});
+} else if (process.env.NODE_ENV === 'production') {
+  config = merge(common, {
+    mode: 'production',
+    devtool: 'source-map',
+    entry: {
+      app: [PATHS.src],
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        // DefinePlugin sets react into production mode and strips down all development code.
+        // Turns out passing ENV 'production' is not enough and with this plugin our bundle
+        // gets about 80kb smaller.
+        'process.env': {
+          NODE_ENV: JSON.stringify('production'),
+        },
+      }),
+      new MiniCssExtractPlugin({
+        filename: '[name].css',
+      }),
+    ],
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          uglifyOptions: {
+            compress: {
+              drop_console: false, // if we drop console, all window.log functions become undefined
+              dead_code: true,
+            },
+            minimize: true,
+            comments: false,
+            sourceMap: false,
+          },
+        }),
+        new OptimizeCssAssetsPlugin({
+          cssProcessorOptions: {
+            map: {
+              inline: false,
+              annotation: true,
+            },
+          },
+          cssProcessorPluginOptions: {
+            preset: ['default', {
+              calc: false,
+              discardComments: { removeAll: true },
+            }],
+          },
+        }),
+      ],
+    },
+  });
+} else {
+  // possible todo: config for just running webpack
+}
