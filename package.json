@@ -46,7 +46,7 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "babel-preset-react-hmre": "^1.0.1",
     "cross-env": "^7.0.2",
-    "css-loader": "^3.4.2",
+    "css-loader": "git+https://github.com/alexhisen/css-loader.git",
     "elementtree": "^0.1.6",
     "eslint": "^3.7.1",
     "eslint-config-airbnb": "^14.0.0",
