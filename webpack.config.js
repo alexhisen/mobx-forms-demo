@@ -252,14 +252,15 @@ if (process.env.NODE_ENV === 'development') {
     optimization: {
       minimizer: [
         new UglifyJsPlugin({
+          parallel: true,
+          sourceMap: true,
+          // These are already defaults in uglifyjs - may not need to be set:
           uglifyOptions: {
             compress: {
               drop_console: false, // if we drop console, all window.log functions become undefined
               dead_code: true,
             },
-            minimize: true,
             comments: false,
-            sourceMap: false,
           },
         }),
         new OptimizeCssAssetsPlugin({
