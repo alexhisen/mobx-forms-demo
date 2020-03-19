@@ -237,14 +237,6 @@ if (process.env.NODE_ENV === 'development') {
       app: [PATHS.src],
     },
     plugins: [
-      new webpack.DefinePlugin({
-        // DefinePlugin sets react into production mode and strips down all development code.
-        // Turns out passing ENV 'production' is not enough and with this plugin our bundle
-        // gets about 80kb smaller.
-        'process.env': {
-          NODE_ENV: JSON.stringify('production'),
-        },
-      }),
       new MiniCssExtractPlugin({
         filename: '[name].css',
       }),
@@ -281,5 +273,5 @@ if (process.env.NODE_ENV === 'development') {
     },
   });
 } else {
-  // possible todo: config for just running webpack
+  config = common;
 }
