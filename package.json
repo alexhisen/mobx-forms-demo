@@ -13,7 +13,7 @@
     "mobx-form-store": "^1.3.3",
     "mobx-react": "^5.4.4",
     "mobx-react-devtools": "^6.1.1",
-    "mobx-schema-form": "^1.9.5",
+    "mobx-schema-form": "^1.9.8",
     "normalize.css": "^4.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
